@@ -30,7 +30,7 @@ class InventorySuppliers(QMainWindow):
 
         # Añadir imagen entre el título y los botones
         image_label = QLabel()
-        image_pixmap = QPixmap("app/images/model_icons/suppliers_crud.png")  # Asegúrate de usar la ruta correcta
+        image_pixmap = QPixmap("images/model_icons/suppliers_crud.png")  # Asegúrate de usar la ruta correcta
         image_label.setPixmap(image_pixmap)
         image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         container_layout.addWidget(image_label)
@@ -40,10 +40,10 @@ class InventorySuppliers(QMainWindow):
         first_row.setSpacing(20)
 
         buttons_row1 = [
-            ("Agregar", "#4CAF50", "app/images/Crud/create.png"),
-            ("Editar", "#2196F3", "app/images/Crud/Update.png"),
-            ("Eliminar", "#F44336", "app/images/Crud/Delete.png"),
-            ("Mostrar Todos", "#9C27B0", "app/images/Crud/show.png"),
+            ("Agregar", "#4CAF50", "images/Crud/create.png"),
+            ("Editar", "#2196F3", "images/Crud/Update.png"),
+            ("Eliminar", "#F44336", "images/Crud/Delete.png"),
+            ("Mostrar Todos", "#9C27B0", "images/Crud/show.png"),
         ]
 
         for text, color, icon_path in buttons_row1:
@@ -55,9 +55,9 @@ class InventorySuppliers(QMainWindow):
         second_row.setSpacing(20)
 
         buttons_row2 = [
-            ("Buscar", "#757575", "app/images/Crud/Search.png"),
-            ("Refrescar", "#FFC107", "app/images/Crud/Refresh.png"),
-            ("Regresar al Menú", "#757575", "app/images/Crud/Return.png"),
+            ("Buscar", "#757575", "images/Crud/Search.png"),
+            ("Refrescar", "#FFC107", "images/Crud/Refresh.png"),
+            ("Regresar al Menú", "#757575", "images/Crud/Return.png"),
         ]
 
         for text, color, icon_path in buttons_row2:

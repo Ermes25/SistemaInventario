@@ -121,26 +121,19 @@ class Dashboard(QMainWindow):
         frame_layout.addLayout(right_layout)
 
     def products_open(self):
-        from views.productos_view import Inventoryproducts
-        from controllers.crud_controller import ConProducto
-        from utils.database import Conexion
-        # Luego en la función donde intentas instanciar la conexión
-        conexion = Conexion(host="localhost", user="root", password="", database="sistemainventario")
-        # Crear el controlador
-        con_producto = ConProducto(conexion)
-        # Crear la ventana de productos
-        self.InventoryProducts = Inventoryproducts()
+        from views.productos_view import InventoryProducts
+        self.InventoryProducts = InventoryProducts()
         self.InventoryProducts.show()
         self.close()
         
     def orders_open(self):
-        from app.views.orders_view import InventoryOrders
-        self.InventoryOrders = InventoryOrders()
-        self.InventoryOrders.show()
+        from views.orders_view import InventoryOrders
+        self.InventoryOrdes = InventoryOrders()
+        self.InventoryOrdes.show()
         self.close()
 
     def suppliers_open(self):
-        from app.views.suppliers_view import InventorySuppliers
+        from views.suppliers_view import InventorySuppliers
         self.InventorySuppliers = InventorySuppliers()
         self.InventorySuppliers.show()
         self.close()
