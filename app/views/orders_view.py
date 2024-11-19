@@ -1,145 +1,384 @@
 import sys
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
-                             QHBoxLayout, QPushButton, QFrame, QLabel)
-from PyQt6.QtGui import QIcon, QFont, QPixmap
+                             QHBoxLayout, QPushButton, QLabel, QLineEdit, QComboBox,
+                             QTableWidget, QTableWidgetItem, QHeaderView)
 from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtGui import QFont, QPixmap, QIcon
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from controllers.orders_con import CrudPedidos
 
 class InventoryOrders(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Gestión de Pedidos")
-        self.setFixedSize(1366, 768)  # Dimensiones para laptop
+        self.setFixedSize(1200, 700)
+        self.setStyleSheet("background-color: #D3D3D3;")
 
-        # Configurar el widget central
-        self.central_widget = QWidget()
-        self.setCentralWidget(self.central_widget)
+        # Instancia del CRUD
+        self.crud_pedidos = CrudPedidos()
 
-        # Layout principal con márgenes amplios
-        self.main_layout = QVBoxLayout(self.central_widget)
-        self.main_layout.setContentsMargins(100, 50, 100, 50)
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        main_layout = QHBoxLayout(central_widget)
 
-        # Frame contenedor
-        self.container_frame = QFrame()
-        self.set_frame_style("#FFFFFF")  # Estilo inicial del marco
-        container_layout = QVBoxLayout(self.container_frame)
-        container_layout.setSpacing(30)
+        left_layout = QVBoxLayout()
+        self.create_left_panel(left_layout)
 
-        # Título
-        title_label = self.create_title("Gestión de Pedidos")
-        container_layout.addWidget(title_label, alignment=Qt.AlignmentFlag.AlignCenter)
+        right_layout = QVBoxLayout()
+        self.create_table(right_layout)
 
-        # Añadir imagen entre el título y los botones
-        image_label = QLabel()
-        image_pixmap = QPixmap("images/model_icons/orders_crud.png")  # Asegúrate de usar la ruta correcta
-        image_label.setPixmap(image_pixmap)
-        image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        container_layout.addWidget(image_label)
+        main_layout.addLayout(left_layout, 1)
+        main_layout.addLayout(right_layout, 2)
 
-        # Layout para la primera fila de botones
-        first_row = QHBoxLayout()
-        first_row.setSpacing(20)
+        # Cargar todos los pedidos inicialmente
+        self.load_all_orders()
 
-        buttons_row1 = [
-            ("Agregar", "#4CAF50", "images/Crud/create.png"),
-            ("Editar", "#2196F3", "images/Crud/Update.png"),
-            ("Eliminar", "#F44336", "images/Crud/Delete.png"),
-            ("Mostrar Todos", "#9C27B0", "images/Crud/show.png"),
-        ]
+    
+    def create_search_bar(self, layout):
+        search_layout = QHBoxLayout()
+        
+        # Botón de búsqueda
+        search_button = QPushButton("Buscar")
+        search_button.setStyleSheet("background-color: #FFF9C4; color: black; border: none; padding: 10px; font-weight: bold;")
+        search_button.clicked.connect(self.search_orders)
+        search_layout.addWidget(search_button)
+        
+        # Campo de entrada de búsqueda
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("Buscar por Producto, Proveedor, ID o Cantidad")
+        self.search_input.setStyleSheet("background-color: white; color: black; padding: 5px; border: 1px solid #CCC;")
+        search_layout.addWidget(self.search_input)
+        
+        layout.addLayout(search_layout)
 
-        for text, color, icon_path in buttons_row1:
-            button = self.create_button(text, color, icon_path)
-            first_row.addWidget(button)
+    def search_orders(self):
+        search_text = self.search_input.text()
+        results = self.crud_pedidos.buscar_pedidos(search_text)
+        self.table.setRowCount(0)
+        for row, order in enumerate(results):
+            self.table.insertRow(row)
+            for col, value in enumerate(order):
+                item = QTableWidgetItem(str(value))
+                item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+                self.table.setItem(row, col, item)
 
-        # Layout para la segunda fila de botones
-        second_row = QHBoxLayout()
-        second_row.setSpacing(20)
+    def create_left_panel(self, layout):
+        # Layout para los botones en la parte superior
+        top_buttons_layout = QHBoxLayout()
 
-        buttons_row2 = [
-            ("Buscar", "#757575", "images/Crud/Search.png"),
-            ("Refrescar", "#FFC107", "images/Crud/Refresh.png"),
-            ("Regresar al Menú", "#757575", "images/Crud/Return.png"),
-        ]
-
-        for text, color, icon_path in buttons_row2:
-            button = self.create_button(text, color, icon_path)
-            second_row.addWidget(button)
-
-        # Botones para cambiar la paleta de colores (sin etiquetas)
-        color_button_row = QHBoxLayout()
-        color_button_row.setSpacing(20)
-
-        color_buttons = [
-            ("Rosado Claro", "#FFB6C1"),  # Color rosado claro
-            ("Verde Claro", "#90EE90"),  # Color verde claro
-            ("Lila Llamativo", "#8A2BE2"),  # Color lila vibrante
-            ("Blanco", "#FFFFFF"),  # Botón para regresar al color blanco
-        ]
-
-        for _, color in color_buttons:
-            button = QPushButton()
-            button.setStyleSheet(f"""
-                QPushButton {{
-                    background-color: {color};
-                    border: none;
-                    border-radius: 20px;  /* Hacer botones circulares */
-                    width: 40px;  /* Tamaño pequeño */
-                    height: 40px;  /* Tamaño pequeño */
-                }}
-            """)
-            button.clicked.connect(lambda checked, c=color: self.set_frame_style(c))  # Cambiar el color del marco
-            color_button_row.addWidget(button)
-
-        # Añadir las filas al contenedor
-        container_layout.addLayout(first_row)
-        container_layout.addLayout(second_row)
-        container_layout.addLayout(color_button_row)
-
-        # Centrar la fila de botones de colores
-        color_button_row.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        # Añadir el marco contenedor al diseño principal
-        self.main_layout.addWidget(self.container_frame)
-
-    def set_frame_style(self, color):
-        """Configura el estilo del marco según el color seleccionado."""
-        self.container_frame.setStyleSheet(f"""
-            QFrame {{
-                background-color: {color};  /* Color seleccionado */
-                border-radius: 20px;
-                padding: 30px;
-            }}
-        """)
-
-    def create_title(self, text):
-        title_label = QLabel(text)
-        title_label.setFont(QFont("Arial", 24, QFont.Weight.Bold))
-        title_label.setStyleSheet("color: black;")  # Cambiar color del texto a negro
-        return title_label
-
-    def create_button(self, text, color, icon_path):
-        button = QPushButton(text)
-        button.setStyleSheet(f"""
-            QPushButton {{
-                background-color: {color};
-                color: white;
+        # Botón "regresar" al dashboard
+        menu_button = QPushButton("")
+        menu_button.setIcon(QIcon("app/images/crud_views/return.png"))
+        menu_button.setIconSize(QSize(24, 24))
+        menu_button.setStyleSheet("""
+            QPushButton {
+                background-color: #FFF9C4;
+                color: black;
                 border: none;
-                border-radius: 10px;
-                padding: 15px;
-                font-size: 16px;
-                font-family: Arial;  /* Asegurarse de que la fuente sea Arial */
-            }}
-            QPushButton:hover {{
-                background-color: {self.darken_color(color)};
-            }}
+                border-radius: 4px;
+                padding: 10px;
+                font-size: 14px;
+                font-weight: bold;
+                margin: 5px;
+            }
+            QPushButton:hover {
+                background-color: #FFEB3B;
+            }
         """)
-        button.setIcon(QIcon(icon_path))  # Usa la ruta correcta para el ícono
-        button.setIconSize(QSize(24, 24))
-        return button
+        menu_button.clicked.connect(self.return_to_dashboard)  # Conecta el botón con el método correspondiente
+        top_buttons_layout.addWidget(menu_button)
 
-    def darken_color(self, color):
-        """Función para oscurecer el color para el efecto hover."""
-        hex_color = color.lstrip('#')
-        rgb = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
-        darkened_rgb = tuple(max(c - 30, 0) for c in rgb)  # Oscurecer el color
-        return f"#{''.join(f'{c:02x}' for c in darkened_rgb)}"
+        # Botón de ayuda redondo
+        help_button = QPushButton("")
+        help_button.setIcon(QIcon("app/images/crud_views/exclamation_mark.png"))
+        help_button.setIconSize(QSize(24, 24))
+        help_button.setStyleSheet("""
+            QPushButton {
+                background-color: white;
+                color: black;
+                border: none;
+                border-radius: 15px;
+                padding: 5px;
+                margin: 5px;
+            }
+            QPushButton:hover {
+                background-color: lightgray;
+            }
+        """)
+        help_button.setFixedSize(30, 30)
+        help_button.setToolTip("<span style='color: black; background-color: white;'>Este es el manual</span>")
+        help_button.clicked.connect(self.open_help_manual)
+        top_buttons_layout.addWidget(help_button)
+
+        # Agregar el layout al panel izquierdo
+        layout.addLayout(top_buttons_layout)
+
+        # Imagen del panel
+        image_label = QLabel()
+        pixmap = QPixmap("app/images/model_icons/crud_orders.png")
+        pixmap = pixmap.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio)
+        image_label.setPixmap(pixmap)
+        image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(image_label)
+
+        # Etiqueta de total de pedidos
+        self.total_label = QLabel("Total de Pedidos: 0")
+        self.total_label.setStyleSheet("font-size: 14px; font-weight: bold; color: black;")
+        layout.addWidget(self.total_label)
+
+        # Layout del formulario de entradas
+        form_layout = QVBoxLayout()
+        self.id_producto_combo = QComboBox()
+        self.id_proveedor_combo = QComboBox()
+        self.load_product_and_provider_names()
+
+        self.fecha_pedido_input = QLineEdit()
+        self.cantidad_pedido_input = QLineEdit()
+
+        # Configuración de estilo para campos de entrada
+        for input_field in [self.fecha_pedido_input, self.cantidad_pedido_input]:
+            input_field.setStyleSheet("""
+                background-color: white;
+                color: black;
+                padding: 5px;
+                border: none;
+            """)
+
+        for combo in [self.id_producto_combo, self.id_proveedor_combo]:
+            combo.setStyleSheet("""
+                background-color: white;
+                color: black;
+                border: none;
+            """)
+
+        # Etiquetas y campos de entrada
+        fields = [
+            ("Producto:", self.id_producto_combo),
+            ("Proveedor:", self.id_proveedor_combo),
+            ("Fecha Pedido:", self.fecha_pedido_input),
+            ("Cantidad:", self.cantidad_pedido_input)
+        ]
+
+        for label_text, widget in fields:
+            label = QLabel(label_text)
+            label.setStyleSheet("font-weight: bold; color: black; padding: 5px;")
+            form_layout.addWidget(label)
+            form_layout.addWidget(widget)
+
+        layout.addLayout(form_layout)
+
+        # Barra de búsqueda colocada justo debajo de los inputs
+        self.create_search_bar(layout)
+
+        # Layout de botones CRUD
+        buttons_layout = QVBoxLayout()
+        top_buttons = QHBoxLayout()
+        bottom_buttons = QHBoxLayout()
+
+        button_data = [
+            ("Agregar", self.add_order),
+            ("Editar", self.edit_order),
+            ("Eliminar", self.delete_order),
+            ("Refrescar", self.load_all_orders),
+            ("Limpiar", self.clear_form)
+        ]
+
+        for i, (text, func) in enumerate(button_data):
+            button = QPushButton(text)
+            button.setStyleSheet("""
+                background-color: lightyellow;
+                color: black;
+                font-weight: bold;
+                padding: 6px;
+                font-size : 12px;
+                border: none;
+            """)
+            button.clicked.connect(func)
+            if i < 3:
+                top_buttons.addWidget(button)
+            else:
+                bottom_buttons.addWidget(button)
+
+        buttons_layout.addLayout(top_buttons)
+        buttons_layout.addLayout(bottom_buttons)
+        layout.addLayout(buttons_layout)
+    def create_table(self, layout):
+        self.table = QTableWidget()
+        self.table.setStyleSheet("""
+            QTableWidget {
+                background-color: white;
+                border: 1px solid #BDBDBD;
+                gridline-color: #E0E0E0;
+            }
+            QHeaderView::section {
+                background-color: #E0E0E0;
+                color: black;
+                padding: 5px;
+                border: 1px solid #BDBDBD;
+                font-weight: bold;
+            }
+            QTableWidget::item {
+                color: black;
+                padding: 5px;
+            }
+        """)
+        headers = ["ID Pedido", "Producto", "Proveedor", "Fecha Pedido", "Cantidad"]  # Cambié los nombres de columna
+        self.table.setColumnCount(len(headers))
+        self.table.setHorizontalHeaderLabels(headers)
+
+        # Aseguramos que las cabeceras sean visibles
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+
+        # Conectar la selección de una fila a una función para cargar los datos en los campos
+        self.table.selectionModel().selectionChanged.connect(self.load_selected_order)
+
+        layout.addWidget(self.table)
+
+    def load_all_orders(self):
+        orders = self.crud_pedidos.cargar_pedidos()
+        self.table.setRowCount(0)
+        for row, order in enumerate(orders):
+            self.table.insertRow(row)
+            self.table.setItem(row, 0, QTableWidgetItem(str(order[0])))  # ID Pedido
+            producto_nombre = self.crud_pedidos.obtener_nombre_producto(order[1])
+            proveedor_nombre = self.crud_pedidos.obtener_nombre_proveedor(order[2])
+            self.table.setItem(row, 1, QTableWidgetItem(producto_nombre))  # Nombre Producto
+            self.table.setItem(row, 2, QTableWidgetItem(proveedor_nombre))  # Nombre Proveedor
+            for col, value in enumerate(order[3:], start=3):  # Comenzamos desde la columna 3
+                item = QTableWidgetItem(str(value))
+                item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+                self.table.setItem(row, col, item)
+        self.total_label.setText(f"Total de Pedidos: {len(orders)}")
+
+    def load_product_and_provider_names(self):
+        productos = self.crud_pedidos.cargar_productos()
+        proveedores = self.crud_pedidos.cargar_proveedores()
+
+        self.id_producto_combo.clear()
+        self.id_producto_combo.addItems([p[1] for p in productos])  # Cargar solo los nombres
+        self.id_proveedor_combo.clear()
+        self.id_proveedor_combo.addItems([p[1] for p in proveedores])  # Cargar solo los nombres
+
+    def add_order(self):
+        # Obtener los IDs a partir de los nombres seleccionados
+        nombre_producto = self.id_producto_combo.currentText()
+        nombre_proveedor = self.id_proveedor_combo.currentText()
+        id_producto = self.crud_pedidos.obtener_id_producto(nombre_producto)
+        id_proveedor = self.crud_pedidos.obtener_id_proveedor(nombre_proveedor)
+        fecha_pedido = self.fecha_pedido_input.text()
+        cantidad_pedido = self.cantidad_pedido_input.text()
+        self.crud_pedidos.agregar_pedido(id_producto, id_proveedor, fecha_pedido, cantidad_pedido)
+        self.load_all_orders()
+
+    
+    def load_selected_order(self):
+        selected_row = self.table.currentRow()
+        if selected_row >= 0:
+            id_pedido_item = self.table.item(selected_row, 0)
+            producto_item = self.table.item(selected_row, 1)
+            proveedor_item = self.table.item(selected_row, 2)
+            fecha_item = self.table.item(selected_row, 3)
+            cantidad_item = self.table.item(selected_row, 4)
+
+            if id_pedido_item and producto_item and proveedor_item and fecha_item and cantidad_item:
+                id_pedido = id_pedido_item.text()
+                nombre_producto = producto_item.text()
+                nombre_proveedor = proveedor_item.text()
+                fecha_pedido = fecha_item.text()
+                cantidad_pedido = cantidad_item.text()
+
+                # Fill inputs
+                self.id_producto_combo.setCurrentText(nombre_producto)
+                self.id_proveedor_combo.setCurrentText(nombre_proveedor)
+                self.fecha_pedido_input.setText(fecha_pedido)
+                self.cantidad_pedido_input.setText(cantidad_pedido)
+
+                # Store selected ID for editing or deleting
+                self.selected_order_id = id_pedido
+
+        selected_row = self.table.currentRow()
+        if selected_row >= 0:
+            id_pedido_item = self.table.item(selected_row, 0)
+            if id_pedido_item is not None:
+                id_pedido = id_pedido_item.text()
+            else:
+                return
+
+            id_producto_item = self.table.item(selected_row, 1)
+            nombre_producto = id_producto_item.text() if id_producto_item is not None else ""
+            id_producto = self.crud_pedidos.obtener_id_producto_por_nombre(nombre_producto)
+
+            id_proveedor_item = self.table.item(selected_row, 2)
+            nombre_proveedor = id_proveedor_item.text() if id_proveedor_item is not None else ""
+            id_proveedor = self.crud_pedidos.obtener_id_proveedor_por_nombre(nombre_proveedor)
+
+            fecha_pedido_item = self.table.item(selected_row, 3)
+            fecha_pedido = fecha_pedido_item.text() if fecha_pedido_item is not None else ""
+
+            cantidad_pedido_item = self.table.item(selected_row, 4)
+            cantidad_pedido = cantidad_pedido_item.text() if cantidad_pedido_item is not None else ""
+
+            # Rellenar los campos con los datos seleccionados
+            self.id_producto_combo.setCurrentText(nombre_producto)
+            self.id_proveedor_combo.setCurrentText(nombre_proveedor)
+            self.fecha_pedido_input.setText(fecha_pedido)
+            self.cantidad_pedido_input.setText(cantidad_pedido)
+
+    def edit_order(self):
+        selected_row = self.table.currentRow()
+        if selected_row >= 0:
+            id_pedido_item = self.table.item(selected_row, 0)
+            if id_pedido_item is not None:
+                id_pedido = id_pedido_item.text()
+
+                # Obtener datos actualizados desde los campos
+                nombre_producto = self.id_producto_combo.currentText()
+                nombre_proveedor = self.id_proveedor_combo.currentText()
+                id_producto = self.crud_pedidos.obtener_id_producto(nombre_producto)
+                id_proveedor = self.crud_pedidos.obtener_id_proveedor(nombre_proveedor)
+                fecha_pedido = self.fecha_pedido_input.text()
+                cantidad_pedido = self.cantidad_pedido_input.text()
+
+                # Actualizar el pedido en la base de datos
+                self.crud_pedidos.editar_pedido(id_pedido, id_producto, id_proveedor, fecha_pedido, cantidad_pedido)
+                self.load_all_orders()
+
+    def delete_order(self):
+        selected_row = self.table.currentRow()
+        if selected_row >= 0:
+            id_pedido_item = self.table.item(selected_row, 0)
+            if id_pedido_item is not None:
+                id_pedido = id_pedido_item.text()
+                self.crud_pedidos.eliminar_pedido(id_pedido)
+                self.load_all_orders()
+
+    def clear_form(self):
+        # Ocultar todas las filas del grid
+        row_count = self.table.rowCount()
+        for row in range(row_count):
+            self.table.setRowHidden(row, True)
+
+
+    def return_to_dashboard(self):
+        import sys
+        import os
+        sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+        from views.Dashboard import Dashboard  # Importa el Dashboard
+        self.dashboard = Dashboard()  # Crea una instancia del Dashboard
+        self.dashboard.show()  # Muestra el Dashboard
+        self.close()  # Cierra la ventana actual
+
+    def open_help_manual(self):
+        import subprocess
+        import os
+        pdf_path = os.path.abspath("app/utils/manual.pdf")  # Asegúrate de que sea una ruta válida
+        try:
+            if os.path.exists(pdf_path):
+                subprocess.Popen([pdf_path], shell=True)  # Abre el PDF con la aplicación predeterminada
+            else:
+                print(f"El archivo no existe: {pdf_path}")
+        except Exception as e:
+            print(f"No se pudo abrir el archivo: {e}")
+
 

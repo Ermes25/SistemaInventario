@@ -1,139 +1,112 @@
 import sys
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-                             QPushButton, QLabel, QFrame, QMessageBox)
-from PyQt6.QtGui import QPainter, QColor, QFont, QIcon, QPixmap
-from PyQt6.QtCore import Qt, QSize
-
-class GradientWidget(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.background = QPixmap("app/images/Backgrounds/Inventory_Background.jpg")
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        
-        # Draw the background image, scaled to fit while maintaining aspect ratio
-        scaled_background = self.background.scaled(self.size(), Qt.AspectRatioMode.KeepAspectRatioByExpanding, Qt.TransformationMode.SmoothTransformation)
-        
-        # Calculate position to center the image
-        x = (self.width() - scaled_background.width()) // 2
-        y = (self.height() - scaled_background.height()) // 2
-        
-        painter.drawPixmap(x, y, scaled_background)
-
-class IconButton(QPushButton):
-    def __init__(self, text, icon_path, parent=None):
-        super().__init__(text, parent)
-        self.setFixedSize(250, 100)
-        self.setFont(QFont("Arial", 14))
-        self.setStyleSheet(""" 
-            QPushButton {
-                background-color: white;
-                color: black;
-                border: 1px solid #ddd;
-                border-radius: 10px;
-                text-align: center;
-                padding-left: 10px;
-            }
-            QPushButton:hover {
-                background-color: #f0f0f0;
-            }
-        """)
-        self.setIcon(QIcon(icon_path))
-        self.setIconSize(QSize(64, 64))
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QLabel, QHBoxLayout
+from PyQt6.QtGui import QIcon, QFont
+from PyQt6.QtCore import Qt, QTimer, QTime, QDate
 
 class Dashboard(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Inventario")
+        self.setWindowTitle("Dashboard")
         self.setFixedSize(1366, 768)
-        
-        # Create central widget and layout
-        central_widget = QWidget()
+        self.setStyleSheet("background-color: lightgray;")  # Fondo gris claro
+
+        # Central widget
+        central_widget = QWidget(self)
         self.setCentralWidget(central_widget)
-        main_layout = QVBoxLayout(central_widget)
-        main_layout.setContentsMargins(0, 0, 0, 0)
+        layout = QVBoxLayout(central_widget)
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)  # Centrar todo el contenido
 
-        # Create gradient background
-        gradient_widget = GradientWidget()
-        main_layout.addWidget(gradient_widget)
-        
-        # Create main frame
-        self.main_frame = QFrame(gradient_widget)
-        self.main_frame.setStyleSheet("""background-color: white; 
-                                      border-radius: 20px;
-                                      background-image: url(app/images/Backgrounds/background_Dashboard.jpeg);""")
-        self.main_frame.setFixedSize(800, 600)
-        self.main_frame.move(283, 84)  # Center the frame
+        # Label "Bienvenido"
+        welcome_label = QLabel("FARMA BIENESTAR")
+        welcome_label.setFont(QFont("Arial", 28, QFont.Weight.Bold))
+        welcome_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        welcome_label.setStyleSheet("color: black;")
+        layout.addWidget(welcome_label)
 
-        # Create layout for main frame
-        frame_layout = QHBoxLayout(self.main_frame)
+        # Layout para los iconos y botones
+        icons_buttons_layout = QHBoxLayout()
+        icons_buttons_layout.setSpacing(50)  # Espaciado entre cada columna
+        icons_buttons_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)  # Centrar las columnas
 
-        # Create left side layout
-        left_layout = QVBoxLayout()
-        
-        # Add header
-        header_label = QLabel("Bienvenidos")
-        header_label.setFont(QFont("Arial", 26, QFont.Weight.Bold))
-        left_layout.addWidget(header_label)
-        
-        # Add stretcher to push "Salir" button to bottom
-        left_layout.addStretch()
-        
-        # Add "Salir" button
-        exit_button = QPushButton("Salir")
-        exit_button.setFixedSize(100, 40)
-        exit_button.setStyleSheet(""" 
-            QPushButton {
-                background-color: white;
-                color: black;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-            }
-            QPushButton:hover {
-                background-color: #f0f0f0;
-            }
-        """)
-        exit_button.clicked.connect(self.close)
-        left_layout.addWidget(exit_button, alignment=Qt.AlignmentFlag.AlignLeft)
-
-        # Add left layout to frame layout
-        frame_layout.addLayout(left_layout)
-
-        # Add stretcher between left side and buttons
-        frame_layout.addStretch()
-
-        # Create right side layout for buttons
-        right_layout = QVBoxLayout()
-        
-        # Create icon buttons
-        buttons_data = [
-            ("Productos", "app/images/model_icons/products_dashboard.png", self.products_open),
-            ("Pedidos", "app/images/model_icons/orders_dashboard.png", self.orders_open),
-            ("Proveedores", "app/images/model_icons/suppliers_dashboard.png", self.suppliers_open)
+        items = [
+            ("Productos", "app/images/model_icons/dashproducts.png", self.products_open),
+            ("Proveedores", "app/images/model_icons/dashsuppliers.png", self.suppliers_open),
+            ("Pedidos", "app/images/model_icons/dashorders.png", self.orders_open)
         ]
-        for text, icon_path, slot in buttons_data:
-            button = IconButton(text, icon_path)
-            button.clicked.connect(slot)
-            right_layout.addWidget(button)
 
-        # Add right layout to frame layout
-        frame_layout.addLayout(right_layout)
+        for text, icon_path, slot in items:
+            item_layout = QVBoxLayout()
+            item_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+            # Icono
+            icon_label = QLabel()
+            icon_label.setPixmap(QIcon(icon_path).pixmap(100, 100))  # Tamaño del icono fijo
+            icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            item_layout.addWidget(icon_label)
+
+            # Botón
+            button = QPushButton(text)
+            button.setFont(QFont("Arial", 16, QFont.Weight.Bold))
+            button.setStyleSheet("""
+                QPushButton {
+                    background-color: #FFFF99;  /* Amarillo claro */
+                    color: black;
+                    border: none;
+                    border-radius: 10px;
+                    padding: 5px;
+                }
+                QPushButton:hover {
+                    background-color: #FFD700;  /* Más oscuro al pasar el cursor */
+                }
+                QPushButton:pressed {
+                    background-color: #FF6347;  /* Resaltado cuando se hace clic */
+                }
+            """)
+            button.setFixedSize(200, 50)  # Tamaño fijo para todos los botones
+            button.clicked.connect(slot)
+            item_layout.addWidget(button)
+
+            # Asegurarse de que el botón esté alineado correctamente
+            item_layout.setContentsMargins(0, 10, 0, 0)  # Márgenes entre el icono y el botón
+
+            icons_buttons_layout.addLayout(item_layout)
+
+        layout.addLayout(icons_buttons_layout)
+
+        # Layout para la fecha y hora (en una fila)
+        self.time_label = QLabel(self)
+        self.time_label.setFont(QFont("Digital-7", 18))  # Fuente digital
+        self.time_label.setStyleSheet("color: black;")  # Color negro para los números
+        self.time_label.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.time_label.setText("Fecha y hora cargando...")  # Mensaje inicial
+
+        # Ajustar la posición y tamaño del QLabel para la fecha y hora
+        self.time_label.setGeometry(1050, 10, 300, 30)  # Ajustar el tamaño para que se vea completo
+
+        # Actualización de fecha y hora en tiempo real
+        timer = QTimer(self)
+        timer.timeout.connect(self.update_time)
+        timer.start(1000)  # Actualizar cada segundo
 
     def products_open(self):
         from views.productos_view import InventoryProducts
-        self.InventoryProducts = InventoryProducts()
-        self.InventoryProducts.show()
+        self.ventanaproducto = InventoryProducts()
+        self.ventanaproducto.show()
         self.close()
-        
+    def suppliers_open(self):
+        from views.suppliers_view import InventoryProveedores
+        self.ventanaproveedor = InventoryProveedores()
+        self.ventanaproveedor.show()
+        self.close()
     def orders_open(self):
         from views.orders_view import InventoryOrders
-        self.InventoryOrdes = InventoryOrders()
-        self.InventoryOrdes.show()
+        self.ventanapedido = InventoryOrders()
+        self.ventanapedido.show()
         self.close()
 
-    def suppliers_open(self):
-        from views.suppliers_view import InventorySuppliers
-        self.InventorySuppliers = InventorySuppliers()
-        self.InventorySuppliers.show()
-        self.close()
+    def update_time(self):
+        # Obtener la fecha y hora actual
+        current_time = QTime.currentTime().toString("hh:mm")  # Hora
+        current_date = QDate.currentDate().toString("dd-MM-yyyy")  # Fecha
+        self.time_label.setText(f"{current_date} {current_time}")  # Mostrar fecha y hora en una sola línea
+

@@ -26,7 +26,6 @@ CREATE TABLE IF NOT EXISTS proveedores (
 -- Crear la tabla de pedidos
 CREATE TABLE IF NOT EXISTS pedidos (
     id_pedido INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_cliente VARCHAR(255) NOT NULL,
     id_producto INT,
     id_proveedor INT,
     fecha_pedido TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Almacena fecha y hora del pedido automáticamente
