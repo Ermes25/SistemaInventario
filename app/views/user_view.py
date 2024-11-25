@@ -17,6 +17,7 @@ class InventoryUsuarios(QMainWindow):
         self.crud = CRUDUsuarios()
         self.setWindowTitle("Control de Usuarios")
         self.setFixedSize(1200, 700)
+        self.setWindowIcon(QIcon("app/images/Backgrounds/Farma_Bienestar.png"))
         self.setStyleSheet("background-color: #D3D3D3;")
 
         central_widget = QWidget()
@@ -39,27 +40,29 @@ class InventoryUsuarios(QMainWindow):
     def create_left_panel(self, layout):
         top_buttons_layout = QHBoxLayout()
 
-        # Botón "Regresar al Menú"
+         # Botón "regresar" al dashboard
         menu_button = QPushButton("")
         menu_button.setIcon(QIcon("app/images/crud_views/return.png"))
         menu_button.setIconSize(QSize(24, 24))
+        menu_button.setFixedWidth(80)  # Botón menos ancho
         menu_button.setStyleSheet("""
             QPushButton {
-                background-color: #FFF9C4;
+                background-color: #B3E5FC;  /* Celeste claro */
                 color: black;
                 border: none;
                 border-radius: 4px;
-                padding: 10px;
+                padding: 8px;
                 font-size: 14px;
                 font-weight: bold;
                 margin: 5px;
             }
             QPushButton:hover {
-                background-color: #FFEB3B;
+                background-color: #81D4FA;
             }
         """)
         menu_button.clicked.connect(self.return_to_login)  # Conecta el botón con el método correspondiente
-        top_buttons_layout.addWidget(menu_button)
+        top_buttons_layout.addWidget(menu_button, alignment=Qt.AlignmentFlag.AlignLeft) 
+        
 
         # Aplicar estilo global al tooltip para mejorar su visibilidad
         app_instance = QApplication.instance()
@@ -140,18 +143,17 @@ class InventoryUsuarios(QMainWindow):
         search_button = QPushButton("Buscar")
         search_button.setStyleSheet("""  
             QPushButton {
-                background-color: #FFF9C4;
-                color: black;
-                border: none;
-                border-radius: 4px;
-                padding: 10px;
-                font-size: 14px;
-                font-weight: bold;
-                margin: 5px;
-            }
+                background-color: #B3E5FC;  /* Celeste claro */
+                    color: black;
+                    border: none;
+                    border-radius: 4px;
+                    padding: 2px;
+                    font-size: 14px;
+                    font-weight: bold;
+                    margin: 5px;
+                }
             QPushButton:hover {
-                background-color: #FFEB3B;
-            }
+                    background-color: #81D4FA;  /* Celeste más oscuro */
         """)
         search_button.setFixedSize(120, 40)
         search_button.clicked.connect(self.search_user)
@@ -192,17 +194,16 @@ class InventoryUsuarios(QMainWindow):
             button = QPushButton(text)
             button.setStyleSheet("""  
                 QPushButton {
-                    background-color: #FFF9C4;
+                    background-color: #B3E5FC;  /* Celeste claro */
                     color: black;
                     border: none;
-                    border-radius: 4px;
-                    padding: 6px;
-                    font-size: 12px;
+                    border-radius: 20px;
+                    padding: 10px;
+                    font-size: 14px;
                     font-weight: bold;
-                    margin: 5px;
                 }
                 QPushButton:hover {
-                    background-color: #FFEB3B;
+                    background-color: #81D4FA;
                 }
             """)
             button.clicked.connect(func)
@@ -370,4 +371,3 @@ class InventoryUsuarios(QMainWindow):
         self.loginreturn = LoginForm()
         self.loginreturn.show()
         self.close()
-

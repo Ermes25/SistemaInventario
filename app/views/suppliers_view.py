@@ -18,6 +18,7 @@ class InventoryProveedores(QMainWindow):
         super().__init__()
         self.setWindowTitle("Control de Proveedores")
         self.setFixedSize(1200, 700)
+        self.setWindowIcon(QIcon("app/images/Backgrounds/Farma_Bienestar.png"))
         self.setStyleSheet("background-color: #D3D3D3;")
 
         self.crud = SupplierCRUD()  # Crear instancia de SupplierCRUD
@@ -42,14 +43,36 @@ class InventoryProveedores(QMainWindow):
     def create_left_panel(self, layout):
         top_buttons_layout = QHBoxLayout()
 
-        
         # Botón "regresar" al dashboard
         menu_button = QPushButton("")
         menu_button.setIcon(QIcon("app/images/crud_views/return.png"))
         menu_button.setIconSize(QSize(24, 24))
+        menu_button.setFixedWidth(80)  # Botón menos ancho
         menu_button.setStyleSheet("""
             QPushButton {
-                background-color: #FFF9C4;
+                background-color: #B3E5FC;  /* Celeste claro */
+                color: black;
+                border: none;
+                border-radius: 4px;
+                padding: 8px;
+                font-size: 14px;
+                font-weight: bold;
+                margin: 5px;
+            }
+            QPushButton:hover {
+                background-color: #81D4FA;
+            }
+        """)
+        menu_button.clicked.connect(self.return_to_dashboard)  # Conecta el botón con el método correspondiente
+        top_buttons_layout.addWidget(menu_button, alignment=Qt.AlignmentFlag.AlignLeft) 
+        
+        # Botón para exportar registros a CSV
+        export_button = QPushButton("Exportar")
+        export_button.setIcon(QIcon("app/images/model_icons/csv_icon.png"))  # Cambia el icono según corresponda
+        export_button.setIconSize(QSize(24, 24))
+        export_button.setStyleSheet("""
+            QPushButton {
+                background-color: #B3E5FC;  /* Celeste claro */
                 color: black;
                 border: none;
                 border-radius: 4px;
@@ -59,35 +82,11 @@ class InventoryProveedores(QMainWindow):
                 margin: 5px;
             }
             QPushButton:hover {
-                background-color: #FFEB3B;
+                background-color: #81D4FA;
             }
         """)
-        menu_button.clicked.connect(self.return_to_dashboard)  # Conecta el botón con el método correspondiente
-        top_buttons_layout.addWidget(menu_button)
-
-        # Botón de ayuda redondo
-        help_button = QPushButton("")
-        help_button.setIcon(QIcon("app/images/crud_views/exclamation_mark.png"))
-        help_button.setIconSize(QSize(24, 24))
-        help_button.setStyleSheet("""
-            QPushButton {
-                background-color: white;
-                color: black;
-                border: none;
-                border-radius: 15px;
-                padding: 5px;
-                margin: 5px;
-            }
-            QPushButton:hover {
-                background-color: lightgray;
-            }
-        """)
-        help_button.setFixedSize(30, 30)
-        help_button.setToolTip("<span style='color: black; background-color: white;'>Este es el manual</span>")
-        help_button.clicked.connect(self.open_help_manual)
-        top_buttons_layout.addWidget(help_button)
-
-        # Agregar el layout al panel izquierdo
+        export_button.clicked.connect(self.export_to_csv)  # Conecta al método de exportar
+        top_buttons_layout.addWidget(export_button)
         layout.addLayout(top_buttons_layout)
         # Agregar imagen
         image_label = QLabel()
@@ -151,17 +150,17 @@ class InventoryProveedores(QMainWindow):
         search_button = QPushButton("Buscar")
         search_button.setStyleSheet("""
             QPushButton {
-                background-color: #FFF9C4;
-                color: black;
-                border: none;
-                border-radius: 4px;
-                padding: 10px;
-                font-size: 14px;
-                font-weight: bold;
-                margin: 5px;
-            }
+                background-color: #B3E5FC;  /* Celeste claro */
+                    color: black;
+                    border: none;
+                    border-radius: 4px;
+                    padding: 10px;
+                    font-size: 14px;
+                    font-weight: bold;
+                    margin: 5px;
+                }
             QPushButton:hover {
-                background-color: #FFEB3B;
+                    background-color: #81D4FA;  /* Celeste más oscuro */
             }
         """)
         search_button.clicked.connect(self.search_provider)
@@ -200,18 +199,16 @@ class InventoryProveedores(QMainWindow):
             button = QPushButton(text)
             button.setStyleSheet("""
                 QPushButton {
-                    background-color: #FFF9C4;
+                    background-color: #B3E5FC;  /* Celeste claro */
                     color: black;
                     border: none;
-                    border-radius: 4px;
-                    padding: 6px;
-                    font-size: 12px;
+                    border-radius: 20px;
+                    padding: 10px;
+                    font-size: 14px;
                     font-weight: bold;
-                    margin: 5px;
-                    height : 100px;
                 }
                 QPushButton:hover {
-                    background-color: #FFEB3B;
+                    background-color: #81D4FA;
                 }
             """)
             button.clicked.connect(func)
@@ -359,4 +356,38 @@ class InventoryProveedores(QMainWindow):
             self.findChild(QLineEdit, "nombre_proveedor").setText(nombre)
             self.findChild(QLineEdit, "numero_proveedor").setText(numero)
             self.findChild(QLineEdit, "email").setText(email)
+
+    def export_to_csv(self):
+        import csv
+        from PyQt6.QtWidgets import QFileDialog
+
+        # Abrir un cuadro de diálogo para seleccionar la ubicación del archivo
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Guardar archivo CSV",
+            "registros_productos.csv",  # Nombre sugerido por defecto
+            "Archivos CSV (*.csv)"
+        )
+
+        if not file_path:  # Si el usuario cancela, no hacer nada
+            return
+
+        try:
+            with open(file_path, mode='w', newline='', encoding='utf-8') as file:
+                writer = csv.writer(file)
+
+                # Escribir los encabezados
+                headers = [self.table.horizontalHeaderItem(i).text() for i in range(self.table.columnCount())]
+                writer.writerow(headers)
+
+                # Escribir los datos de la tabla
+                for row in range(self.table.rowCount()):
+                    writer.writerow([
+                        self.table.item(row, col).text() if self.table.item(row, col) else ""
+                        for col in range(self.table.columnCount())
+                    ])
+
+            print(f"Registros exportados a {file_path}")
+        except Exception as e:
+            print(f"Error al exportar registros: {e}")
 

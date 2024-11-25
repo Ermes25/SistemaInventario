@@ -1,112 +1,135 @@
 import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QLabel, QHBoxLayout
-from PyQt6.QtGui import QIcon, QFont
-from PyQt6.QtCore import Qt, QTimer, QTime, QDate
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QLabel, QHBoxLayout, QSpacerItem, QSizePolicy
+from PyQt6.QtGui import QIcon, QFont, QPalette, QBrush, QImage
+from PyQt6.QtCore import Qt, QTimer, QTime, QDate, QSize
 
 class Dashboard(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Dashboard")
-        self.setFixedSize(1366, 768)
-        self.setStyleSheet("background-color: lightgray;")  # Fondo gris claro
+        self.setMinimumSize(1200, 700)  # Tamaño mínimo
+        self.setWindowIcon(QIcon("app/images/Backgrounds/Farma_Bienestar.png"))  # Icono de la ventana
 
         # Central widget
         central_widget = QWidget(self)
         self.setCentralWidget(central_widget)
-        layout = QVBoxLayout(central_widget)
-        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)  # Centrar todo el contenido
+        main_layout = QHBoxLayout(central_widget)  # Cambio a layout horizontal
 
-        # Label "Bienvenido"
-        welcome_label = QLabel("FARMA BIENESTAR")
-        welcome_label.setFont(QFont("Arial", 28, QFont.Weight.Bold))
-        welcome_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        welcome_label.setStyleSheet("color: black;")
-        layout.addWidget(welcome_label)
+        # Layout izquierdo para fecha/hora
+        left_layout = QVBoxLayout()
+        
+        # Fecha y hora
+        self.time_label = QLabel()
+        self.time_label.setFont(QFont("Digital-7", 22))
+        self.time_label.setStyleSheet("""
+            QLabel {
+                color: black;
+                background: transparent;
+                padding: 5px;
+                border-radius: 5px;
+            }
+        """)
+        left_layout.addWidget(self.time_label)
+        left_layout.addStretch()  # Espacio flexible
+        main_layout.addLayout(left_layout, stretch=2)
 
-        # Layout para los iconos y botones
-        icons_buttons_layout = QHBoxLayout()
-        icons_buttons_layout.setSpacing(50)  # Espaciado entre cada columna
-        icons_buttons_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)  # Centrar las columnas
+        # Layout derecho para botones
+        right_layout = QVBoxLayout()
+        right_layout.setSpacing(30)  # Aumentar el espacio entre botones
+
+        # Añadir un espaciador flexible encima de los botones para moverlos hacia abajo
+        right_layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
 
         items = [
             ("Productos", "app/images/model_icons/dashproducts.png", self.products_open),
             ("Proveedores", "app/images/model_icons/dashsuppliers.png", self.suppliers_open),
-            ("Pedidos", "app/images/model_icons/dashorders.png", self.orders_open)
+            ("Pedidos", "app/images/model_icons/dashorders.png", self.orders_open),
+            ("Salidas", "app/images/model_icons/dashsalidas.png", self.salidas_open),  # Nuevo botón
         ]
 
         for text, icon_path, slot in items:
-            item_layout = QVBoxLayout()
-            item_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-            # Icono
-            icon_label = QLabel()
-            icon_label.setPixmap(QIcon(icon_path).pixmap(100, 100))  # Tamaño del icono fijo
-            icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            item_layout.addWidget(icon_label)
-
-            # Botón
-            button = QPushButton(text)
-            button.setFont(QFont("Arial", 16, QFont.Weight.Bold))
+            item_layout = QHBoxLayout()  # Layout horizontal para cada botón
+            
+            # Label del texto
+            text_label = QLabel(text)
+            text_label.setFont(QFont("Arial", 20))
+            text_label.setStyleSheet("color: #333; background: transparent;")
+            
+            # Botón con icono
+            button = QPushButton()
+            button.setIcon(QIcon(icon_path))
+            button.setIconSize(QSize(80, 80))  # Tamaño del icono
+            button.clicked.connect(slot)
+            button.setFixedSize(80, 80)  # Botón más grande
             button.setStyleSheet("""
                 QPushButton {
-                    background-color: #FFFF99;  /* Amarillo claro */
-                    color: black;
+                    background-color: rgba(33, 150, 243, 0.8);  /* Azul semitransparente */
                     border: none;
-                    border-radius: 10px;
-                    padding: 5px;
+                    border-radius: 40px;  /* Ajustado al tamaño */
+                    padding: 10px;
                 }
                 QPushButton:hover {
-                    background-color: #FFD700;  /* Más oscuro al pasar el cursor */
+                    background-color: rgba(33, 150, 243, 0.9);
                 }
                 QPushButton:pressed {
-                    background-color: #FF6347;  /* Resaltado cuando se hace clic */
+                    background-color: rgba(33, 150, 243, 1.0);
                 }
             """)
-            button.setFixedSize(200, 50)  # Tamaño fijo para todos los botones
-            button.clicked.connect(slot)
+
             item_layout.addWidget(button)
+            item_layout.addWidget(text_label)
+            right_layout.addLayout(item_layout)
 
-            # Asegurarse de que el botón esté alineado correctamente
-            item_layout.setContentsMargins(0, 10, 0, 0)  # Márgenes entre el icono y el botón
+        # Añadir un espaciador flexible debajo de los botones
+        right_layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
 
-            icons_buttons_layout.addLayout(item_layout)
+        # Ajustar alineación del layout principal
+        main_layout.addSpacerItem(QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
+        main_layout.addLayout(right_layout)
 
-        layout.addLayout(icons_buttons_layout)
 
-        # Layout para la fecha y hora (en una fila)
-        self.time_label = QLabel(self)
-        self.time_label.setFont(QFont("Digital-7", 18))  # Fuente digital
-        self.time_label.setStyleSheet("color: black;")  # Color negro para los números
-        self.time_label.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.time_label.setText("Fecha y hora cargando...")  # Mensaje inicial
-
-        # Ajustar la posición y tamaño del QLabel para la fecha y hora
-        self.time_label.setGeometry(1050, 10, 300, 30)  # Ajustar el tamaño para que se vea completo
-
-        # Actualización de fecha y hora en tiempo real
+        # Timer para actualizar fecha y hora
         timer = QTimer(self)
         timer.timeout.connect(self.update_time)
-        timer.start(1000)  # Actualizar cada segundo
+        timer.start(1000)
+        self.update_time()  # Actualizar inmediatamente
 
     def products_open(self):
         from views.productos_view import InventoryProducts
         self.ventanaproducto = InventoryProducts()
         self.ventanaproducto.show()
         self.close()
+
     def suppliers_open(self):
         from views.suppliers_view import InventoryProveedores
         self.ventanaproveedor = InventoryProveedores()
         self.ventanaproveedor.show()
         self.close()
+
     def orders_open(self):
         from views.orders_view import InventoryOrders
         self.ventanapedido = InventoryOrders()
         self.ventanapedido.show()
         self.close()
 
+    def salidas_open(self):
+        # Implementar la lógica para abrir la ventana de salidas
+        print("Abriendo ventana de Salidas")
+
     def update_time(self):
-        # Obtener la fecha y hora actual
-        current_time = QTime.currentTime().toString("hh:mm")  # Hora
-        current_date = QDate.currentDate().toString("dd-MM-yyyy")  # Fecha
-        self.time_label.setText(f"{current_date} {current_time}")  # Mostrar fecha y hora en una sola línea
+        current_time = QTime.currentTime().toString("hh:mm")
+        current_date = QDate.currentDate().toString("dd-MM-yyyy")
+        self.time_label.setText(f"{current_date} {current_time}")
+
+    def resizeEvent(self, event):
+        # Asegurar que la imagen de fondo se ajuste al tamaño de la ventana
+        background = QImage("app/images/Backgrounds/Background.jpg").scaled(
+            self.size(),
+            Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+            Qt.TransformationMode.SmoothTransformation
+        )
+        palette = QPalette()
+        palette.setBrush(QPalette.ColorRole.Window, QBrush(background))
+        self.setPalette(palette)
+        super().resizeEvent(event)
 
