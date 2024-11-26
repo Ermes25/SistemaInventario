@@ -192,7 +192,7 @@ class InventoryProducts(QMainWindow):
             ("Editar", self.edit_product),
             ("Eliminar", self.delete_product),
             ("Refrescar", self.load_all_products),
-            ("Limpiar Tabla", self.clear_table),
+            ("Limpiar", self.clear_table),
         ]
 
         for i, (text, func) in enumerate(button_data):

@@ -192,7 +192,7 @@ class InventoryProveedores(QMainWindow):
             ("Editar", self.edit_provider),
             ("Eliminar", self.delete_provider),
             ("Refrescar", self.refresh_providers),
-            ("Limpiar Tabla", self.clear_table),
+            ("Limpiar", self.clear_table),
         ]
 
         for i, (text, func) in enumerate(button_data):

@@ -43,8 +43,7 @@ class Dashboard(QMainWindow):
         items = [
             ("Productos", "app/images/model_icons/dashproducts.png", self.products_open),
             ("Proveedores", "app/images/model_icons/dashsuppliers.png", self.suppliers_open),
-            ("Pedidos", "app/images/model_icons/dashorders.png", self.orders_open),
-            ("Salidas", "app/images/model_icons/dashsalidas.png", self.salidas_open),  # Nuevo botón
+            ("Pedidos", "app/images/model_icons/dashorders.png", self.orders_open),  
         ]
 
         for text, icon_path, slot in items:
@@ -111,10 +110,6 @@ class Dashboard(QMainWindow):
         self.ventanapedido = InventoryOrders()
         self.ventanapedido.show()
         self.close()
-
-    def salidas_open(self):
-        # Implementar la lógica para abrir la ventana de salidas
-        print("Abriendo ventana de Salidas")
 
     def update_time(self):
         current_time = QTime.currentTime().toString("hh:mm")
