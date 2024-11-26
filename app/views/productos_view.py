@@ -8,7 +8,7 @@ import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from controllers.products_con import ProductCRUD
-
+from datetime import datetime
 
 class InventoryProducts(QMainWindow):
     def __init__(self):
@@ -135,8 +135,8 @@ class InventoryProducts(QMainWindow):
                     background-color: white;
                     color: black;
                     border: 1px solid #BDBDBD;
-                    border-radius: 4px;
-                    padding: 6px;  /* Ajusta el relleno interno */
+                    border-radius: 2px;
+                    padding: 2px;  /* Ajusta el relleno interno */
                     font-size: 12px;  /* Tamaño de la fuente más legible */
                     height: 100px;  /* Asegura una altura mínima */
                 }
@@ -240,16 +240,25 @@ class InventoryProducts(QMainWindow):
                 padding: 5px;
             }
         """)
-        headers = ["ID Producto", "Nombre", "Categoría", "Fecha Ingreso", "Fecha Vencimiento", "Cantidad", "Precio"]
+        headers = ["ID Producto", "Nombre", "Categoría", "Fecha Ingreso", "Fecha Vencimiento", "Cantidad", "Precio", "Fecha Límite"]
         self.table.setColumnCount(len(headers))
         self.table.setHorizontalHeaderLabels(headers)
-        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
         # Conectar el evento de selección
         self.table.itemSelectionChanged.connect(self.load_selected_product)
 
         layout.addWidget(self.table)
 
+    def calculate_expiration_status(self,expiration_year):
+        try:
+            # Convertir el año en una fecha al 31 de diciembre de ese año
+            expiration_date = datetime(int(expiration_year), 12, 31)
+            # Comparar con la fecha actual
+            if expiration_date < datetime.now():
+                return "Expirado"
+            return "S. Expirar"
+        except Exception:
+            return "Fecha Inválida"
 
     def load_all_products(self):
         products = self.crud.load_all_products()
@@ -260,7 +269,12 @@ class InventoryProducts(QMainWindow):
                 item = QTableWidgetItem(str(value))
                 item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.table.setItem(row, col, item)
-        self.product_count_label.setText(f"Total Productos: {len(products)}")
+
+            # Calcular el estado de la fecha límite y añadirlo a la tabla
+            expiration_status =self.calculate_expiration_status(product[4])  # Índice de fecha_vencimiento (YEAR)
+            status_item = QTableWidgetItem(expiration_status)
+            status_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.table.setItem(row, len(product), status_item)  # Última columna
 
     def add_product(self):
         nombre = self.findChild(QLineEdit, "nombre_producto").text()
@@ -310,18 +324,49 @@ class InventoryProducts(QMainWindow):
         self.load_all_products()
 
     def search_product(self):
-        search_text = self.search_field.text()
+        search_text = self.search_field.text().strip().lower()  # Convertir a minúsculas para comparación
         if not search_text:
             print("Ingrese un texto para buscar.")
             return
-        products = self.crud.search_product(search_text)
+        
+        products = self.crud.load_all_products()  # Cargar todos los productos
+        filtered_products = []
+        
+        for product in products:
+            # Obtener el estado de expiración
+            expiration_status = self.calculate_expiration_status(product[4])  # Índice de "fecha_vencimiento"
+            
+            # Convertir valores relevantes a minúsculas para búsqueda insensible a mayúsculas
+            product_fields = [
+                str(product[0]).lower(),  # ID Producto
+                str(product[1]).lower(),  # Nombre
+                str(product[2]).lower(),  # Categoría
+                str(product[3]).lower(),  # Fecha Ingreso
+                str(product[4]).lower(),  # Fecha Vencimiento
+                str(product[5]).lower(),  # Cantidad
+                str(product[6]).lower(),  # Precio
+                expiration_status.lower()  # Estado de expiración
+            ]
+            
+            # Comprobar si el texto de búsqueda está en algún campo o en el estado
+            if any(search_text in field for field in product_fields):
+                filtered_products.append(product)
+        
+        # Mostrar solo los productos filtrados
         self.table.setRowCount(0)
-        for row, product in enumerate(products):
+        for row, product in enumerate(filtered_products):
             self.table.insertRow(row)
             for col, value in enumerate(product):
                 item = QTableWidgetItem(str(value))
                 item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.table.setItem(row, col, item)
+            
+            # Añadir estado de "Fecha Límite" al final
+            expiration_status = self.calculate_expiration_status(product[4])
+            status_item = QTableWidgetItem(expiration_status)
+            status_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.table.setItem(row, len(product), status_item)
+
 
     def clear_table(self):
         self.table.setRowCount(0)
