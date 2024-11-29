@@ -100,7 +100,5 @@ Consulta métricas clave como:
 **Solución**: Instala la librería necesaria ejecutando:
 ```bash
 pip install PyQt6
-```bash
 pip install PyQt6 tools
-```bash
- pip install mysql-connector-python
+pip install mysql-connector-python
