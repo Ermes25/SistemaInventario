@@ -289,24 +289,31 @@ class InventoryUsuarios(QMainWindow):
             print("No se encontraron usuarios con ese nombre.")
             self.table.setRowCount(0)  # Limpiar la tabla si no hay resultados
 
-
     def add_user(self):
+        # Obtener los campos de entrada
         username_field = self.findChild(QLineEdit, "username")
         password_field = self.findChild(QLineEdit, "password")
         username = username_field.text().strip()
         password = password_field.text().strip()
 
+        # Validar que los campos no estén vacíos
         if not username or not password:
             print("Error: El nombre de usuario y la contraseña no pueden estar vacíos.")
             return
 
-        if self.crud.add_user(username, password):  # Usar el método de la clase
+        # Intentar agregar el usuario utilizando el método de la clase CRUD
+        resultado = self.crud.add_user(username, password)
+
+        if resultado == True:
             print("Usuario agregado exitosamente.")
-            self.refresh_users()
+            self.refresh_users()  # Refrescar la tabla de usuarios
             username_field.clear()
             password_field.clear()
+        elif resultado == "Usuario ya existe":
+            print("Error: El usuario ya existe en la base de datos.")
         else:
             print("Error al agregar el usuario.")
+
 
 
     def edit_user(self):

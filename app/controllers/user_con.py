@@ -23,7 +23,8 @@ class CRUDUsuarios:
                 return []
 
             cursor = connection.cursor()
-            cursor.execute("SELECT id, username, password FROM usuarios;")
+            # Filtrar usuarios excluyendo 'admin' con contraseña '1725'
+            cursor.execute("SELECT id, username, password FROM usuarios WHERE NOT (username = 'admin' AND password = '1725');")
             users = cursor.fetchall()
             connection.close()
             return users
@@ -53,6 +54,14 @@ class CRUDUsuarios:
                 return False
 
             cursor = connection.cursor()
+
+            cursor.execute("SELECT * FROM usuarios WHERE username = %s;", (username,))
+            existing_user = cursor.fetchone()
+
+            if existing_user:
+                print("El usuario ya existe en la base de datos.")
+                return "Usuario ya existe"
+
             cursor.execute(
                 "INSERT INTO usuarios (username, password) VALUES (%s, %s);",
                 (username, password)
@@ -60,9 +69,11 @@ class CRUDUsuarios:
             connection.commit()
             connection.close()
             return True
+
         except mysql.connector.Error as err:
             print(f"Error: {err}")
             return False
+
     def search_user(self, search_term):
         try:
             connection = self.connect_db()

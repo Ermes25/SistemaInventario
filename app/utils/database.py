@@ -63,17 +63,27 @@ class Conexion:
             cursor.close()
 
     def authenticate_user(self, username, password):
-        """Verifica las credenciales del usuario."""
-        # Si el usuario es "admin" y la contraseña es "1725", redirigir a la ventana de usuarios
-        if username == "admin" and password == "1725":
-            return "usuario"  # Esto indica que debe abrir la ventana de usuarios
+        """Verifica las credenciales del usuario y maneja casos donde el usuario ya existe."""
+        try:
+            if username == "admin" and password == "1725":
+                return "usuario"
+            check_user_query = "SELECT * FROM usuarios WHERE username = %s"
+            check_user_params = (username,)
+            user_exists = self.execute_read_query(check_user_query, check_user_params)
 
-        # Verificar en la base de datos si el usuario existe con la contraseña correcta
-        query = "SELECT * FROM usuarios WHERE username = %s AND password = %s"
-        params = (username, password)
-        result = self.execute_read_query(query, params)
+            if user_exists:
+                query = "SELECT * FROM usuarios WHERE username = %s AND password = %s"
+                params = (username, password)
+                result = self.execute_read_query(query, params)
 
-        if result:  # Si el usuario existe en la base de datos
-            return "dashboard"  # Esto indica que debe abrir el dashboard
+                if result:
+                    return "dashboard"  
 
-        return None  # Si las credenciales no son válidas
+                return "Usuario ya existe pero la contraseña es incorrecta."
+            
+            return None 
+
+        except Exception as e:
+            print(f"Error al autenticar el usuario: {e}")
+            return "Error al procesar la solicitud"
+
