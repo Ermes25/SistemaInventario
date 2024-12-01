@@ -198,7 +198,7 @@ class InventoryOrders(QMainWindow):
             ("Editar", self.edit_order),
             ("Eliminar", self.delete_order),
             ("Refrescar", self.load_all_orders),
-            ("Limpiar", self.clear_form)
+            ("Limpiar", self.clear_form),
         ]
 
         for i, (text, func) in enumerate(button_data):
@@ -218,6 +218,7 @@ class InventoryOrders(QMainWindow):
                 }
             """)
             button.clicked.connect(func)
+            button.setFixedSize(120, 40)
             if i < 3:
                 top_buttons.addWidget(button)
             else:
@@ -226,6 +227,7 @@ class InventoryOrders(QMainWindow):
         buttons_layout.addLayout(top_buttons)
         buttons_layout.addLayout(bottom_buttons)
         layout.addLayout(buttons_layout)
+
     def create_table(self, layout):
         self.table = QTableWidget()
         self.table.setStyleSheet("""

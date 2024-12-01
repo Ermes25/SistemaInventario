@@ -187,7 +187,8 @@ class InventoryUsuarios(QMainWindow):
             ("Editar", self.edit_user),
             ("Eliminar", self.delete_user),
             ("Refrescar", self.refresh_users),
-            ("Limpiar Tabla", self.clear_table),
+            ("Limpiar", self.clear_table),
+            ("Permisos", self.permisos_user)
         ]
 
         for i, (text, func) in enumerate(button_data):
@@ -377,4 +378,6 @@ class InventoryUsuarios(QMainWindow):
         from views.login_view import LoginForm
         self.loginreturn = LoginForm()
         self.loginreturn.show()
-        self.close()
+        self.close()    
+    def permisos_user(self):
+        pass

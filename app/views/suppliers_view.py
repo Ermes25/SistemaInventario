@@ -391,3 +391,4 @@ class InventoryProveedores(QMainWindow):
         except Exception as e:
             print(f"Error al exportar registros: {e}")
 
+    

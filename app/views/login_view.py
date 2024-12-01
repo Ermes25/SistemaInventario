@@ -98,7 +98,7 @@ class LoginForm(QWidget):
         frame_layout.addLayout(password_container)
 
         # Login button
-        login_button = QPushButton("INICIAR SESION")
+        login_button = QPushButton("INICIAR SESIÓN")
         login_button.setStyleSheet("""
             QPushButton {
                 background-color: #5CD6C9;
@@ -116,6 +116,12 @@ class LoginForm(QWidget):
         """)
         login_button.clicked.connect(self.on_login_clicked)
         frame_layout.addWidget(login_button)
+
+        # Establecer el botón como predeterminado
+        login_button.setDefault(True)
+
+        # Permitir también activar el botón con Enter/Intro
+        login_button.setFocus()
 
         # Additional icon and label below login button
         bottom_container = QHBoxLayout()

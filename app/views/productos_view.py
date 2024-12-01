@@ -152,19 +152,18 @@ class InventoryProducts(QMainWindow):
         # Botón de búsqueda
         search_button = QPushButton("Buscar")
         search_button.setStyleSheet("""
-            QPushButton {
-                background-color: #B3E5FC;  /* Celeste claro */
+                QPushButton {
+                    background-color: #B3E5FC;  /* Celeste claro */
                     color: black;
                     border: none;
-                    border-radius: 4px;
+                    border-radius: 20px;
                     padding: 10px;
                     font-size: 14px;
                     font-weight: bold;
-                    margin: 5px;
                 }
-            QPushButton:hover {
-                    background-color: #81D4FA;  /* Celeste más oscuro */
-            }
+                QPushButton:hover {
+                    background-color: #81D4FA;
+                }
         """)
         search_button.clicked.connect(self.search_product)
 
@@ -186,7 +185,9 @@ class InventoryProducts(QMainWindow):
         layout.addLayout(search_layout)
 
         # Botones de acciones
-        buttons_layout = QGridLayout()
+        buttons_layout = QVBoxLayout()
+        top_buttons = QHBoxLayout()
+        bottom_buttons = QHBoxLayout()
         button_data = [
             ("Agregar", self.add_product),
             ("Editar", self.edit_product),
@@ -214,11 +215,14 @@ class InventoryProducts(QMainWindow):
             button.clicked.connect(func)
             button.setFixedSize(120, 40)
             if i < 3:
-                buttons_layout.addWidget(button, 0, i)
+                top_buttons.addWidget(button)
             else:
-                buttons_layout.addWidget(button, 1, i - 3)
+                bottom_buttons.addWidget(button)
 
+        buttons_layout.addLayout(top_buttons)
+        buttons_layout.addLayout(bottom_buttons)
         layout.addLayout(buttons_layout)
+
 
     def create_table(self, layout):
         self.table = QTableWidget()
