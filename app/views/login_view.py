@@ -96,8 +96,7 @@ class LoginForm(QWidget):
         password_container.addWidget(password_icon)
         password_container.addWidget(self.password_input)
         frame_layout.addLayout(password_container)
-
-        # Login button
+       # Login button
         login_button = QPushButton("INICIAR SESIÓN")
         login_button.setStyleSheet("""
             QPushButton {
@@ -121,7 +120,10 @@ class LoginForm(QWidget):
         login_button.setDefault(True)
 
         # Permitir también activar el botón con Enter/Intro
-        login_button.setFocus()
+        login_button.setFocusPolicy(Qt.FocusPolicy.StrongFocus)  # Asegura que el botón pueda recibir el enfoque
+
+        # Si el foco está en un campo de texto, al presionar Enter se ejecutará la acción del botón
+
 
         # Additional icon and label below login button
         bottom_container = QHBoxLayout()
