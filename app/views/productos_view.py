@@ -1,9 +1,9 @@
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QPushButton, QLabel, QTableWidget, QTableWidgetItem, QLineEdit, QHeaderView, QGridLayout
+    QPushButton, QLabel, QTableWidget, QTableWidgetItem, QLineEdit, QHeaderView, QGridLayout, QDateEdit
 )
 from PyQt6.QtGui import QPixmap, QIcon
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import Qt, QSize, QDate
 import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -130,6 +130,37 @@ class InventoryProducts(QMainWindow):
             """)
             input_field = QLineEdit()
             input_field.setObjectName(field_name)
+            if field_name == "fecha_ingreso":
+                input_field = QDateEdit()
+                input_field.setObjectName(field_name)
+                input_field.setCalendarPopup(True)  # Habilitar calendario desplegable
+                input_field.setDisplayFormat("yyyy-MM-dd")  # Formato de visualización
+                input_field.setDate(QDate.currentDate())
+                input_field.setStyleSheet("""
+                    QDateEdit {
+                        background-color: white;
+                        color: black;
+                        border: 1px solid #BDBDBD;
+                        border-radius: 4px;
+                        padding: 4px;
+                        font-size: 12px;
+                    }
+                    QDateEdit::drop-down {
+                        subcontrol-origin: padding;
+                        subcontrol-position: right;
+                        width: 20px;
+                        border-left: 1px solid #BDBDBD;
+                    }
+                    QDateEdit::down-arrow {
+                        image: url(app/images/down_arrow.png);  /* Cambia la ruta al icono si lo necesitas */
+                    }
+                """)  # Fecha actual como predeterminada
+            elif field_name == "fecha_vencimiento":
+                input_field = QLineEdit()
+                input_field.setObjectName(field_name)
+            else:
+                input_field = QLineEdit()
+                input_field.setObjectName(field_name)
             input_field.setStyleSheet("""
                 QLineEdit {
                     background-color: white;
@@ -193,7 +224,7 @@ class InventoryProducts(QMainWindow):
             ("Editar", self.edit_product),
             ("Eliminar", self.delete_product),
             ("Refrescar", self.load_all_products),
-            ("Limpiar", self.clear_table),
+            ("Limpiar", self.clear_inputs),
         ]
 
         for i, (text, func) in enumerate(button_data):
@@ -431,3 +462,18 @@ class InventoryProducts(QMainWindow):
             print(f"Registros exportados a {file_path}")
         except Exception as e:
             print(f"Error al exportar registros: {e}")
+    def clear_inputs(self):
+        """Limpia los campos de entrada especificados."""
+        fields = [
+            ("Nombre Producto:", "nombre_producto"),
+            ("Categoría:", "categoria"),
+            ("Fecha Ingreso:", "fecha_ingreso"),
+            ("Fecha Vencimiento:", "fecha_vencimiento"),
+            ("Cantidad:", "cantidad"),
+            ("Precio:", "precio"),
+        ]
+        for _, field_name in fields:
+            input_field = self.findChild(QLineEdit, field_name)
+            if input_field:  # Verifica que el campo existe
+                input_field.clear()
+        print("Campos de entrada limpiados.")

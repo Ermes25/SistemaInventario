@@ -39,6 +39,7 @@ class InventoryProveedores(QMainWindow):
 
         # Cargar todos los proveedores inicialmente
         self.load_all_providers()
+        self.setup_signals()
 
     def create_left_panel(self, layout):
         top_buttons_layout = QHBoxLayout()
@@ -111,7 +112,7 @@ class InventoryProveedores(QMainWindow):
         form_layout = QVBoxLayout()
         fields = [
             ("Nombre Proveedor:", "nombre_proveedor"),
-            ("Número de Proveedor:", "numero_proveedor"),
+            ("Número Telefonico:", "numero_proveedor"),
             ("Email:", "email"),
         ]
         for label_text, field_name in fields:
@@ -126,6 +127,9 @@ class InventoryProveedores(QMainWindow):
             """)
             input_field = QLineEdit()
             input_field.setObjectName(field_name)
+            if field_name == "numero_proveedor":
+                input_field.setMaxLength(8)  # Máximo 8 caracteres
+                input_field.setValidator(QIntValidator(0, 99999999))
             input_field.setStyleSheet("""
                 QLineEdit {
                     background-color: white;
@@ -192,7 +196,7 @@ class InventoryProveedores(QMainWindow):
             ("Editar", self.edit_provider),
             ("Eliminar", self.delete_provider),
             ("Refrescar", self.refresh_providers),
-            ("Limpiar", self.clear_table),
+            ("Limpiar", self.clear_inputs),
         ]
 
         for i, (text, func) in enumerate(button_data):
@@ -392,3 +396,25 @@ class InventoryProveedores(QMainWindow):
             print(f"Error al exportar registros: {e}")
 
     
+    def setup_signals(self):
+        """Conecta señales para validar los campos de entrada."""
+        numero_input = self.findChild(QLineEdit, "numero_proveedor")
+        if numero_input:  # Verificar que el objeto existe
+            numero_input.textChanged.connect(self.validate_phone_number)
+        else:
+            print("El campo 'numero_proveedor' no fue encontrado.")
+
+    def clear_inputs(self):
+        """Limpia los campos de entrada."""
+        self.findChild(QLineEdit, "nombre_proveedor").clear()
+        self.findChild(QLineEdit, "numero_proveedor").clear()
+        self.findChild(QLineEdit, "email").clear()
+        print("Campos de entrada limpiados.")
+
+    def validate_phone_number(self, text):
+        """Valida la longitud del número de proveedor."""
+        if len(text) > 8:
+            self.findChild(QLineEdit, "numero_proveedor").setText(text[:8])  # Limitar a 8 dígitos
+            print("El número no puede tener más de 8 dígitos.")
+        elif not text.isdigit():
+            print("El número debe ser solo dígitos.")

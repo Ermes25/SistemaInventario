@@ -198,7 +198,7 @@ class InventoryOrders(QMainWindow):
             ("Editar", self.edit_order),
             ("Eliminar", self.delete_order),
             ("Refrescar", self.load_all_orders),
-            ("Limpiar", self.clear_form),
+            ("Limpiar", self.clear_inputs),
         ]
 
         for i, (text, func) in enumerate(button_data):
@@ -439,6 +439,24 @@ class InventoryOrders(QMainWindow):
             print(f"Registros exportados a {file_path}")
         except Exception as e:
             print(f"Error al exportar registros: {e}")
+    def clear_inputs(self):
+        """Limpia los campos de entrada especificados."""
+        fields = [
+            ("Producto:", self.id_producto_combo),
+            ("Proveedor:", self.id_proveedor_combo),
+            ("Fecha Pedido:", self.fecha_pedido_input),
+            ("Cantidad:", self.cantidad_pedido_input),
+        ]
+
+        for label, widget in fields:
+            if isinstance(widget, QLineEdit):
+                widget.clear()  # Limpiar texto en QLineEdit
+            elif hasattr(widget, "setCurrentIndex"):  # Para QComboBox u otros con índices
+                widget.setCurrentIndex(0)
+            else:
+                print(f"Widget no soportado: {label}")
+
+        print("Campos de entrada limpiados.")
 
 
 
