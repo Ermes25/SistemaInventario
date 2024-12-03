@@ -12,7 +12,7 @@ class LoginForm(QWidget):
         super().__init__()
         self.initUI()
         self.sessions = []
-        self.config_dir = "app/utils/allow"
+        self.config_dir = "utils/allow"
         self.config_file = os.path.join(self.config_dir, "sessions_config.json")
         self.load_previous_sessions()  # Cargar usuarios anteriores al iniciar
 
@@ -148,33 +148,72 @@ class LoginForm(QWidget):
         # Reposition the frame when the window is resized
         self.frame.move(self.width() - self.frame.width() - 50, (self.height() - self.frame.height()) // 2)
     def ensure_config_directory(self):
-        """Crear el directorio de configuración si no existe."""
+        """Asegurar que el directorio de configuración predeterminado exista."""
         if not os.path.exists(self.config_dir):
             os.makedirs(self.config_dir)
 
+        if not os.path.exists(self.config_file):
+            with open(self.config_file, "w") as config_file:
+                json.dump({"file_path": ""}, config_file, indent=4)
+
+
     def load_previous_sessions(self):
         """Cargar sesiones desde el archivo JSON configurado."""
-        self.ensure_config_directory()  # Asegurarnos de que el directorio exista
+        self.ensure_config_directory()
 
         try:
-            # Leer la configuración para obtener la ruta del archivo de sesiones
-            with open(self.config_file, "r") as config_file:
-                config = json.load(config_file)
-                file_path = config.get("file_path", "")
+            # Leer la configuración para obtener la ruta del archivo
+            if os.path.exists(self.config_file):
+                with open(self.config_file, "r") as config_file:
+                    try:
+                        config = json.load(config_file)
+                        if isinstance(config, dict):
+                            file_path = config.get("file_path", "")
+                        else:
+                            raise ValueError("El archivo de configuración no tiene el formato esperado.")
+                    except (json.JSONDecodeError, ValueError):
+                        file_path = os.path.join(self.config_dir, "sessions.json")
+            else:
+                file_path = os.path.join(self.config_dir, "sessions.json")
 
-            if file_path and os.path.exists(file_path):
+            if os.path.exists(file_path):
                 with open(file_path, "r") as session_file:
                     self.sessions = json.load(session_file)
             else:
                 self.sessions = []
+                self.save_config_file(file_path)
 
-        except (FileNotFoundError, json.JSONDecodeError):
-            # Si no hay configuración o está dañada, inicializar lista vacía
+        except (FileNotFoundError, json.JSONDecodeError) as e:
             self.sessions = []
+            print(f"Error al cargar las sesiones o el archivo de configuración: {e}")
+
+    def save_config_file(self, file_path):
+        """Guardar la ruta del archivo en la configuración."""
+        with open(self.config_file, "w") as config_file:
+            json.dump({"file_path": file_path}, config_file, indent=4)
+
     def save_session(self, username):
-        """Agregar una nueva sesión al archivo de sesiones."""
+        """Guardar una sesión nueva en el archivo JSON."""
         if username.lower() != "admin" and username not in self.sessions:
             self.sessions.append(username)
+
+            try:
+                # Leer la configuración para obtener la ruta del archivo
+                with open(self.config_file, "r") as config_file:
+                    config = json.load(config_file)
+                    file_path = config.get("file_path", os.path.join(self.config_dir, "sessions.json"))
+            except (FileNotFoundError, json.JSONDecodeError):
+                file_path = os.path.join(self.config_dir, "sessions.json")
+
+            if not os.path.exists(file_path):
+                self.save_config_file(file_path)
+
+            # Guardar las sesiones en el archivo JSON
+            try:
+                with open(file_path, "w") as session_file:
+                    json.dump(self.sessions, session_file, indent=4)
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Error al guardar las sesiones: {str(e)}")
     def closeEvent(self, event):
         """Al cerrar el programa, guardar las sesiones en el archivo seleccionado por el usuario."""
         self.ensure_config_directory()  # Asegurarnos de que el directorio exista

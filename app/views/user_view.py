@@ -368,8 +368,8 @@ class InventoryUsuarios(QMainWindow):
         self.load_all_users()
 
     def clear_table(self):
-        self.table.clearContents()
-        self.table.setRowCount(0)
+        self.findChild(QLineEdit,"username").clear()
+        self.findChild(QLineEdit,"password").clear()
     def return_to_login(self):
         import sys
         import os
