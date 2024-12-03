@@ -17,7 +17,7 @@ class InventoryUsuarios(QMainWindow):
         self.crud = CRUDUsuarios()
         self.setWindowTitle("Control de Usuarios")
         self.setFixedSize(1200, 700)
-        self.setWindowIcon(QIcon("app/images/Backgrounds/Farma_Bienestar.png"))
+        self.setWindowIcon(QIcon("images/Backgrounds/Farma_Bienestar.png"))
         self.setStyleSheet("background-color: #D3D3D3;")
 
         central_widget = QWidget()
@@ -42,7 +42,7 @@ class InventoryUsuarios(QMainWindow):
 
          # Botón "regresar" al dashboard
         menu_button = QPushButton("")
-        menu_button.setIcon(QIcon("app/images/crud_views/return.png"))
+        menu_button.setIcon(QIcon("images/crud_views/return.png"))
         menu_button.setIconSize(QSize(24, 24))
         menu_button.setFixedWidth(80)  # Botón menos ancho
         menu_button.setStyleSheet("""
@@ -82,7 +82,7 @@ class InventoryUsuarios(QMainWindow):
 
         # Agregar imagen o icono
         image_label = QLabel()
-        pixmap = QPixmap("app/images/model_icons/admin.png")  # Ruta de la imagen
+        pixmap = QPixmap("images/model_icons/admin.png")  # Ruta de la imagen
         image_label.setPixmap(pixmap.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio))
         image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(image_label)
@@ -187,8 +187,7 @@ class InventoryUsuarios(QMainWindow):
             ("Editar", self.edit_user),
             ("Eliminar", self.delete_user),
             ("Refrescar", self.refresh_users),
-            ("Limpiar", self.clear_table),
-            ("Permisos", self.permisos_user)
+            ("Limpiar", self.clear_table)
         ]
 
         for i, (text, func) in enumerate(button_data):
@@ -379,7 +378,4 @@ class InventoryUsuarios(QMainWindow):
         self.loginreturn = LoginForm()
         self.loginreturn.show()
         self.close()    
-    def permisos_user(self):
-        from test.permission import PermisosUsuarios
-        self.permisos = PermisosUsuarios()
-        self.permisos.show()
+    

@@ -8,7 +8,7 @@ class Dashboard(QMainWindow):
         super().__init__()
         self.setWindowTitle("Dashboard")
         self.setMinimumSize(1200, 700)  # Tamaño mínimo
-        self.setWindowIcon(QIcon("app/images/Backgrounds/Farma_Bienestar.png"))  # Icono de la ventana
+        self.setWindowIcon(QIcon("images/Backgrounds/Farma_Bienestar.png"))  # Icono de la ventana
 
         # Central widget
         central_widget = QWidget(self)
@@ -41,9 +41,9 @@ class Dashboard(QMainWindow):
         right_layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
 
         items = [
-            ("Productos", "app/images/model_icons/dashproducts.png", self.products_open),
-            ("Proveedores", "app/images/model_icons/dashsuppliers.png", self.suppliers_open),
-            ("Pedidos", "app/images/model_icons/dashorders.png", self.orders_open),  
+            ("Productos", "images/model_icons/dashproducts.png", self.products_open),
+            ("Proveedores", "images/model_icons/dashsuppliers.png", self.suppliers_open),
+            ("Pedidos", "images/model_icons/dashorders.png", self.orders_open),  
         ]
 
         for text, icon_path, slot in items:
@@ -118,7 +118,7 @@ class Dashboard(QMainWindow):
 
     def resizeEvent(self, event):
         # Asegurar que la imagen de fondo se ajuste al tamaño de la ventana
-        background = QImage("app/images/Backgrounds/Background.jpg").scaled(
+        background = QImage("images/Backgrounds/Background.jpg").scaled(
             self.size(),
             Qt.AspectRatioMode.KeepAspectRatioByExpanding,
             Qt.TransformationMode.SmoothTransformation

@@ -19,7 +19,7 @@ class LoginForm(QWidget):
     def initUI(self):
         self.setWindowTitle('Farma Bienestar - Login')
         self.setMinimumSize(1200, 700)  # Set minimum size for the window
-        self.setWindowIcon(QIcon('app/images/Backgrounds/Farma_Bienestar.png'))  # Set window icon
+        self.setWindowIcon(QIcon('images/Backgrounds/Farma_Bienestar.png'))  # Set window icon
 
         # Main layout
         main_layout = QVBoxLayout()
@@ -41,7 +41,7 @@ class LoginForm(QWidget):
 
         # Logo
         logo_label = QLabel(self.frame)
-        logo_pixmap = QPixmap("app/images/logins/user_icon.png")
+        logo_pixmap = QPixmap("images/logins/user_icon.png")
         logo_label.setPixmap(logo_pixmap.scaled(80, 80, Qt.AspectRatioMode.KeepAspectRatio))
         logo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         frame_layout.addWidget(logo_label)
@@ -59,7 +59,7 @@ class LoginForm(QWidget):
         # Username input with icon
         username_container = QHBoxLayout()
         username_icon = QLabel()
-        username_icon.setPixmap(QPixmap("app/images/logins/usr.png").scaled(20, 20))
+        username_icon.setPixmap(QPixmap("images/logins/usr.png").scaled(20, 20))
         self.username_input = QLineEdit()
         self.username_input.setPlaceholderText("Usuario")
         self.username_input.setFont(QFont("Arial", 11))
@@ -79,7 +79,7 @@ class LoginForm(QWidget):
         # Password input with icon
         password_container = QHBoxLayout()
         password_icon = QLabel()
-        password_icon.setPixmap(QPixmap("app/images/logins/pwd.png").scaled(20, 20))
+        password_icon.setPixmap(QPixmap("images/logins/pwd.png").scaled(20, 20))
         self.password_input = QLineEdit()
         self.password_input.setPlaceholderText("Contraseña")
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
@@ -130,7 +130,7 @@ class LoginForm(QWidget):
 
         # Manual icon (unchanged position)
         bottom_icon = QLabel()
-        bottom_icon_pixmap = QPixmap("app/images/Backgrounds/icon_exclamation_mark.png")
+        bottom_icon_pixmap = QPixmap("images/Backgrounds/icon_exclamation_mark.png")
         bottom_icon.setPixmap(bottom_icon_pixmap.scaled(40, 40, Qt.AspectRatioMode.KeepAspectRatio))
         bottom_container.addWidget(bottom_icon)
         bottom_container.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -243,7 +243,7 @@ class LoginForm(QWidget):
             QMessageBox.warning(self, "Error", f"No se encontró el archivo: {pdf_path}")
 
     def open_users_window(self):
-        from app.views.user_view import InventoryUsuarios
+        from views.user_view import InventoryUsuarios
         self.usuarios_window = InventoryUsuarios()
         self.usuarios_window.show()
         self.close()
@@ -257,7 +257,7 @@ class LoginForm(QWidget):
     def paintEvent(self, event):
         """Evento de pintura para establecer la imagen de fondo"""
         painter = QPainter(self)
-        background = QImage("app/images/Backgrounds/Background.jpg")
+        background = QImage("images/Backgrounds/Background.jpg")
         if not background.isNull():
             scaled_background = background.scaled(self.size(), Qt.AspectRatioMode.KeepAspectRatioByExpanding, Qt.TransformationMode.SmoothTransformation)
 

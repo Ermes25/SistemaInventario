@@ -13,7 +13,7 @@ class InventoryOrders(QMainWindow):
         super().__init__()
         self.setWindowTitle("Control de Pedidos")
         self.setFixedSize(1200, 700)
-        self.setWindowIcon(QIcon("app/images/Backgrounds/Farma_Bienestar.png"))
+        self.setWindowIcon(QIcon("images/Backgrounds/Farma_Bienestar.png"))
         self.setStyleSheet("background-color: #D3D3D3;")
 
         # Instancia del CRUD
@@ -84,7 +84,7 @@ class InventoryOrders(QMainWindow):
 
          # Botón "regresar" al dashboard
         menu_button = QPushButton("")
-        menu_button.setIcon(QIcon("app/images/crud_views/return.png"))
+        menu_button.setIcon(QIcon("images/crud_views/return.png"))
         menu_button.setIconSize(QSize(24, 24))
         menu_button.setFixedWidth(80)  # Botón menos ancho
         menu_button.setStyleSheet("""
@@ -107,7 +107,7 @@ class InventoryOrders(QMainWindow):
         
          # Botón para exportar registros a CSV
         export_button = QPushButton("Exportar")
-        export_button.setIcon(QIcon("app/images/model_icons/csv_icon.png"))  # Cambia el icono según corresponda
+        export_button.setIcon(QIcon("images/model_icons/csv_icon.png"))  # Cambia el icono según corresponda
         export_button.setIconSize(QSize(24, 24))
         export_button.setStyleSheet("""
             QPushButton {
@@ -133,7 +133,7 @@ class InventoryOrders(QMainWindow):
 
         # Imagen del panel
         image_label = QLabel()
-        pixmap = QPixmap("app/images/model_icons/crud_orders.png")
+        pixmap = QPixmap("images/model_icons/crud_orders.png")
         pixmap = pixmap.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio)
         image_label.setPixmap(pixmap)
         image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -397,7 +397,7 @@ class InventoryOrders(QMainWindow):
     def open_help_manual(self):
         import subprocess
         import os
-        pdf_path = os.path.abspath("app/utils/manual.pdf")  # Asegúrate de que sea una ruta válida
+        pdf_path = os.path.abspath("utils/manual.pdf")  # Asegúrate de que sea una ruta válida
         try:
             if os.path.exists(pdf_path):
                 subprocess.Popen([pdf_path], shell=True)  # Abre el PDF con la aplicación predeterminada
