@@ -107,7 +107,7 @@ class InventoryProducts(QMainWindow):
 
         layout.addStretch(1)  # Espaciador
 
-        # Crear formulario para datos
+       # Crear formulario para datos
         form_layout = QVBoxLayout()
         fields = [
             ("Nombre Producto:", "nombre_producto"),
@@ -128,54 +128,37 @@ class InventoryProducts(QMainWindow):
                     padding: 5px;
                 }
             """)
+
             input_field = QLineEdit()
             input_field.setObjectName(field_name)
+
+            # Configurar campos específicos
             if field_name == "fecha_ingreso":
-                input_field = QDateEdit()
-                input_field.setObjectName(field_name)
-                input_field.setCalendarPopup(True)  # Habilitar calendario desplegable
-                input_field.setDisplayFormat("yyyy-MM-dd")  # Formato de visualización
-                input_field.setDate(QDate.currentDate())
-                input_field.setStyleSheet("""
-                    QDateEdit {
-                        background-color: white;
-                        color: black;
-                        border: 1px solid #BDBDBD;
-                        border-radius: 4px;
-                        padding: 4px;
-                        font-size: 12px;
-                    }
-                    QDateEdit::drop-down {
-                        subcontrol-origin: padding;
-                        subcontrol-position: right;
-                        width: 20px;
-                        border-left: 1px solid #BDBDBD;
-                    }
-                    QDateEdit::down-arrow {
-                        image: url(app/images/down_arrow.png);  /* Cambia la ruta al icono si lo necesitas */
-                    }
-                """)  # Fecha actual como predeterminada
+                input_field.setPlaceholderText("Formato: yyyy-mm-dd")  # Ayuda visual para la fecha
             elif field_name == "fecha_vencimiento":
-                input_field = QLineEdit()
-                input_field.setObjectName(field_name)
-            else:
-                input_field = QLineEdit()
-                input_field.setObjectName(field_name)
+                input_field.setPlaceholderText("Formato: yyyy-mm-dd")
+            elif field_name == "cantidad":
+                input_field.setPlaceholderText("Solo números")
+            elif field_name == "precio":
+                input_field.setPlaceholderText("Ejemplo: 123.45")
+
             input_field.setStyleSheet("""
                 QLineEdit {
                     background-color: white;
                     color: black;
                     border: 1px solid #BDBDBD;
                     border-radius: 2px;
-                    padding: 2px;  /* Ajusta el relleno interno */
-                    font-size: 12px;  /* Tamaño de la fuente más legible */
-                    height: 100px;  /* Asegura una altura mínima */
+                    padding: 2px;
+                    font-size: 12px;
+                    height: 30px;
                 }
             """)
+
             form_layout.addWidget(label)
             form_layout.addWidget(input_field)
 
         layout.addLayout(form_layout)
+
 
         # Campo de búsqueda
         search_layout = QHBoxLayout()
@@ -408,18 +391,33 @@ class InventoryProducts(QMainWindow):
         self.product_count_label.setText("Total Productos: 0")
         print("Tabla limpiada.")
     def load_selected_product(self):
-        # Obtener la fila seleccionada
+        # Supongamos que los datos vienen desde una fila seleccionada en la tabla
         selected_row = self.table.currentRow()
-        if selected_row == -1:  # Verificar si hay una fila seleccionada
+        if selected_row == -1:  # Si no hay una fila seleccionada, no hacemos nada
             return
 
-        # Rellenar los campos con los datos de la fila seleccionada
-        self.findChild(QLineEdit, "nombre_producto").setText(self.table.item(selected_row, 1).text())
-        self.findChild(QLineEdit, "categoria").setText(self.table.item(selected_row, 2).text())
-        self.findChild(QLineEdit, "fecha_ingreso").setText(self.table.item(selected_row, 3).text())
-        self.findChild(QLineEdit, "fecha_vencimiento").setText(self.table.item(selected_row, 4).text())
-        self.findChild(QLineEdit, "cantidad").setText(self.table.item(selected_row, 5).text())
-        self.findChild(QLineEdit, "precio").setText(self.table.item(selected_row, 6).text())
+        # Obtener valores desde la tabla
+        nombre = self.table.item(selected_row, 1).text()
+        categoria = self.table.item(selected_row, 2).text()
+        fecha_ingreso = self.table.item(selected_row, 3).text()
+        fecha_vencimiento = self.table.item(selected_row, 4).text()
+        cantidad = self.table.item(selected_row, 5).text()
+        precio = self.table.item(selected_row, 6).text()
+
+        # Llenar los campos del formulario
+        self.findChild(QLineEdit, "nombre_producto").setText(nombre)
+        self.findChild(QLineEdit, "categoria").setText(categoria)
+
+        # Mostrar solo la fecha sin la hora en el campo fecha_ingreso
+        if fecha_ingreso:
+            fecha_solo = fecha_ingreso.split(" ")[0]  # Separar fecha y hora, tomar solo la fecha
+            self.findChild(QLineEdit, "fecha_ingreso").setText(fecha_solo)
+        else:
+            self.findChild(QLineEdit, "fecha_ingreso").clear()
+
+        self.findChild(QLineEdit, "fecha_vencimiento").setText(fecha_vencimiento)
+        self.findChild(QLineEdit, "cantidad").setText(cantidad)
+        self.findChild(QLineEdit, "precio").setText(precio)
     def return_to_dashboard(self):
         import sys
         import os

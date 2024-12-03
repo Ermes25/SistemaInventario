@@ -380,4 +380,6 @@ class InventoryUsuarios(QMainWindow):
         self.loginreturn.show()
         self.close()    
     def permisos_user(self):
-        pass
+        from test.permission import PermisosUsuarios
+        self.permisos = PermisosUsuarios()
+        self.permisos.show()
