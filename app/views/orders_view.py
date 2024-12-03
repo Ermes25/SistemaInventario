@@ -1,9 +1,9 @@
 import sys
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QHBoxLayout, QPushButton, QLabel, QLineEdit, QComboBox,
-                             QTableWidget, QTableWidgetItem, QHeaderView)
-from PyQt6.QtCore import Qt, QSize
-from PyQt6.QtGui import QFont, QPixmap, QIcon
+                             QTableWidget, QTableWidgetItem, QHeaderView, QDateEdit)
+from PyQt6.QtCore import Qt, QSize, QDate,QRegularExpression
+from PyQt6.QtGui import QFont, QPixmap, QIcon,QRegularExpressionValidator
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from controllers.orders_con import CrudPedidos
@@ -146,15 +146,32 @@ class InventoryOrders(QMainWindow):
 
         # Layout del formulario de entradas
         form_layout = QVBoxLayout()
+
+        # Comboboxes para producto y proveedor
         self.id_producto_combo = QComboBox()
         self.id_proveedor_combo = QComboBox()
         self.load_product_and_provider_names()
 
+        # Campo de fecha con formato yyyy-mm-dd (editable)
         self.fecha_pedido_input = QLineEdit()
+
+        # Establecer un validador para el formato de fecha yyyy-mm-dd
+        date_format = QRegularExpression(r"^\d{4}-\d{2}-\d{2}$")  # Expresión regular para yyyy-mm-dd
+        date_validator = QRegularExpressionValidator(date_format)
+        self.fecha_pedido_input.setValidator(date_validator)
+        self.fecha_pedido_input.setStyleSheet("""
+                    background-color: white;
+                    color: black;
+                    padding: 5px;
+                    border: none;
+                """)
+
+
+        # Campo de cantidad de pedido
         self.cantidad_pedido_input = QLineEdit()
 
-        # Configuración de estilo para campos de entrada
-        for input_field in [self.fecha_pedido_input, self.cantidad_pedido_input]:
+        # Configuración de estilo para los campos de entrada
+        for input_field in [self.cantidad_pedido_input]:
             input_field.setStyleSheet("""
                 background-color: white;
                 color: black;

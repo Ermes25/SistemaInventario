@@ -134,7 +134,7 @@ class InventoryProducts(QMainWindow):
 
             # Configurar campos específicos
             if field_name == "fecha_ingreso":
-                input_field.setPlaceholderText("Formato: yyyy-mm-dd")  # Ayuda visual para la fecha
+                input_field.setPlaceholderText("Formato: yyyy-mm-dd")  
             elif field_name == "fecha_vencimiento":
                 input_field.setPlaceholderText("Formato: yyyy-mm-dd")
             elif field_name == "cantidad":
