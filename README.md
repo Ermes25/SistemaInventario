@@ -5,7 +5,7 @@ Un sistema de inventario es un conjunto de procedimientos y normas que permiten 
 ## Herramientas
 ![Python](https://img.icons8.com/?size=100&id=13441&format=png&color=000000)![Mysql](https://img.icons8.com/?size=100&id=9nLaR5KFGjN0&format=png&color=000000)
 
-# 📦 Sistema de Inventario - Manual de Usuario
+# 📦 Sistema de Inventario - Manual Tecnico
 
 ## ✨ Introducción
 
@@ -23,7 +23,7 @@ El **Sistema de Inventario** es una herramienta diseñada para facilitar la gest
 - 🐍 **Lenguaje**: Python 3.10 o superior.
 - 🖼️ **Framework**: PyQt6 para la interfaz gráfica.
 - 🗄️ **Base de datos**: MySQL (compatible con otras bases de datos SQL).
-- ⚙️ **ORM**: SQLAlchemy.
+- ⚙️ **ORM**: MySQL Connector.
 
 ### Hardware:
 - ⚡ **Procesador**: Intel i3 o superior.
@@ -35,11 +35,11 @@ El **Sistema de Inventario** es una herramienta diseñada para facilitar la gest
 ## 🚀 Instalación
 
 ### Paso 1: Clonar el repositorio
-git clone https://github.com/Ermes25/PROSYS.git
+https://github.com/Ermes25/system_inventary.git
 
 ### Paso 2: Configuración inicial
 
-1. Abre el archivo de configuración del sistema, usualmente llamado `config.py` o similar.
+1. Abre el archivo de configuración del sistema, usualmente llamado `database.py` o similar.
 2. Localiza la sección de **configuración de la base de datos**.
 3. Edita los valores correspondientes para que coincidan con tu entorno. Por ejemplo:
 
@@ -96,7 +96,7 @@ Consulta métricas clave como:
 
 ## 🛠️ Resolución de Problemas
 
-### 🐍 **Error**: `ModuleNotFoundError: No module named 'PyQt6'`
+### 🐍 **Error**: `ModuleNotFoundError: No module named 'PyQt6 o PyQt6 Tools o Mysql Connector'`
 **Solución**: Instala la librería necesaria ejecutando:
 ```bash
 pip install PyQt6
