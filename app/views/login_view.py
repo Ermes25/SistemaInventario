@@ -12,7 +12,7 @@ class LoginForm(QWidget):
         super().__init__()
         self.initUI()
         self.sessions = []
-        self.config_dir = "utils/allow"
+        self.config_dir = "utils/scripts/json"
         self.config_file = os.path.join(self.config_dir, "sessions_config.json")
         self.load_previous_sessions()  # Cargar usuarios anteriores al iniciar
 
@@ -275,7 +275,7 @@ class LoginForm(QWidget):
 
     def open_manual(self, event):
         """Abrir archivo PDF de manual."""
-        pdf_path = "app/utils/manual.pdf"
+        pdf_path = "utils/pdf/manual.pdf"
         if os.path.exists(pdf_path):
             QDesktopServices.openUrl(QUrl.fromLocalFile(pdf_path))
         else:

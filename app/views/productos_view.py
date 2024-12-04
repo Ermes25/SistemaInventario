@@ -293,7 +293,7 @@ class InventoryProducts(QMainWindow):
             status_item = QTableWidgetItem(expiration_status)
             status_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
             self.table.setItem(row, len(product), status_item)  # Última columna
-
+            self.product_count_label.setText(f"Total Productos: {len(products)}")
     def add_product(self):
         nombre = self.findChild(QLineEdit, "nombre_producto").text()
         categoria = self.findChild(QLineEdit, "categoria").text()
