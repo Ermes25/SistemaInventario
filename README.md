@@ -5,7 +5,7 @@ Un sistema de inventario es un conjunto de procedimientos y normas que permiten 
 ## Herramientas
 ![Python](https://img.icons8.com/?size=100&id=13441&format=png&color=000000)![Mysql](https://img.icons8.com/?size=100&id=9nLaR5KFGjN0&format=png&color=000000)
 
-# 📦 Sistema de Inventario - Manual de Usuario
+# 📦 Sistema de Inventario - Manual Tecnico
 
 ## ✨ Introducción
 
