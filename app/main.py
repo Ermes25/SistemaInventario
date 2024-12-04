@@ -11,7 +11,7 @@ def main():
     login = LoginForm()
     # Mostrar la ventana
     login.show()
-    # Ejecutar el bucle de la aplicación
+    #bucle
     sys.exit(app.exec())
 
 if __name__ == "__main__":
