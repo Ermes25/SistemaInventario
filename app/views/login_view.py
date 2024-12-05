@@ -275,7 +275,7 @@ class LoginForm(QWidget):
 
     def open_manual(self, event):
         """Abrir archivo PDF de manual."""
-        pdf_path = "utils/pdf/manual.pdf"
+        pdf_path = "utils/pdf/user_instruction.pdf"
         if os.path.exists(pdf_path):
             QDesktopServices.openUrl(QUrl.fromLocalFile(pdf_path))
         else:
