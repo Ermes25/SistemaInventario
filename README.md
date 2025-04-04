@@ -35,7 +35,7 @@ El **Sistema de Inventario** es una herramienta diseñada para facilitar la gest
 ## 🚀 Instalación
 
 ### Paso 1: Clonar el repositorio
-https://github.com/Ermes25/system_inventary.git
+[https://github.com/Ermes25/system_inventary.git](https://github.com/Ermes25/SistemaInventario.git)
 
 ### Paso 2: Configuración inicial
 
